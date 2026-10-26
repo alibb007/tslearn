@@ -354,7 +354,11 @@ class KNeighborsTimeSeries(KNeighborsTimeSeriesMixin,
         check_is_fitted(self)
 
         if X is not None:
-            X = check_array(X, allow_nd=True, force_all_finite=self.metric in TSLEARN_VALID_METRICS)
+            X = check_array(
+                X,
+                allow_nd=True,
+                force_all_finite="allow-nan" if self.metric in TSLEARN_VALID_METRICS else True
+            )
             X = check_dims(
                 X,
                 X_fit_dims=tuple(self._X_fit_dims_),
@@ -405,7 +409,11 @@ class KNeighborsTimeSeries(KNeighborsTimeSeriesMixin,
             raise ValueError("Not implemented for softdtw")
 
         if X is not None:
-            X = check_array(X, allow_nd=True, force_all_finite=self.metric in TSLEARN_VALID_METRICS)
+            X = check_array(
+                X,
+                allow_nd=True,
+                force_all_finite="allow-nan" if self.metric in TSLEARN_VALID_METRICS else True
+            )
             X = check_dims(
                 X,
                 X_fit_dims=tuple(self._X_fit_dims_),

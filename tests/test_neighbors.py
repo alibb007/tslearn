@@ -137,6 +137,16 @@ def test_kneighbors_sax():
     np.testing.assert_equal(model.kneighbors(X[2:]), np.array([[[0.]], [[2]]]))
 
 
+def test_kneighbors_variable_length_query():
+    X_train = to_time_series_dataset([[1, 2, 3, 4], [3, 3, 2, 0, 1], [1, 2, 2, 4, 5, 6]])
+    X_query = to_time_series_dataset([[1, 2, 3], [0, 1, 2, 3, 4]])
+    model = KNeighborsTimeSeries(n_neighbors=1, metric="dtw").fit(X_train)
+    dist, ind = model.kneighbors(X_query)
+    np.testing.assert_allclose(dist, np.array([[1.], [1.]]))
+    np.testing.assert_equal(ind, np.array([[0], [0]]))
+    assert len(model.radius_neighbors(X_query, radius=3.0)[1]) == 2
+
+
 def test_kneighbors_metric_params():
     rng = np.random.RandomState(0)
     X = rng.randn(10, 5, 3)
