@@ -426,11 +426,14 @@ class KNeighborsTimeSeries(KNeighborsTimeSeriesMixin,
             if X is None:
                 # Ensure not a neighbor of itself
                 full_dist_matrix[np.diag_indices_from(full_dist_matrix)] = radius + int(radius >= 0)
+            # sklearn validates _fit_X as finite even when precomputed, but
+            # only its number of rows matters here (fitted TS may be NaN-padded)
             with self._patch_attribute("metric", "precomputed"):
                 with self._patch_attribute("effective_metric_", "precomputed"):
-                    return super().radius_neighbors(
-                        full_dist_matrix, radius, return_distance, sort_results
-                    )
+                    with self._patch_attribute("_fit_X", np.zeros((fitted.shape[0], 1))):
+                        return super().radius_neighbors(
+                            full_dist_matrix, radius, return_distance, sort_results
+                        )
 
         else:
             X = to_sklearn_dataset(X) if X is not None else X
